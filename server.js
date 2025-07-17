@@ -1,4 +1,3 @@
-
 import express from 'express';
 import dotenv from 'dotenv';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
@@ -23,31 +22,48 @@ const s3 = new S3Client({
 });
 
 const app = express();
-app.use(express.json({ limit: '16mb' }));
+app.use(express.json({ limit: '20mb' }));
 
-const put = async (Key, Body, ContentType = 'text/plain') => {
-  await s3.send(
-    new PutObjectCommand({ Bucket: R2_BUCKET, Key, Body, ContentType })
-  );
-  return `${R2_ENDPOINT}/${R2_BUCKET}/${Key}`;
-};
-
+// Upload audio file
 app.post('/upload-audio', async (req, res) => {
   try {
     const { filename, base64 } = req.body;
-
-    if (!filename || !base64) {
-      return res.status(400).json({ error: 'Missing filename or base64 data' });
-    }
+    if (!filename || !base64) return res.status(400).json({ error: 'Missing filename or base64 data' });
 
     const buffer = Buffer.from(base64, 'base64');
-    const url = await put(filename, buffer, 'audio/mpeg');
-
+    const url = await uploadToR2(filename, buffer, 'audio/mpeg');
     res.json({ uploaded: true, url });
   } catch (err) {
-    console.error('Upload audio failed:', err);
+    console.error('Audio upload failed:', err);
     res.status(500).json({ error: err.message });
   }
 });
 
-app.listen(PORT, () => console.log(`🚀 R2 TTS uploader running on :${PORT}`));
+// Upload image file
+app.post('/upload-image', async (req, res) => {
+  try {
+    const { filename, base64 } = req.body;
+    if (!filename || !base64) return res.status(400).json({ error: 'Missing filename or base64 data' });
+
+    const buffer = Buffer.from(base64, 'base64');
+    const url = await uploadToR2(filename, buffer, 'image/png');
+    res.json({ uploaded: true, url });
+  } catch (err) {
+    console.error('Image upload failed:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+const uploadToR2 = async (Key, Body, ContentType) => {
+  await s3.send(new PutObjectCommand({
+    Bucket: R2_BUCKET,
+    Key,
+    Body,
+    ContentType
+  }));
+  return `${R2_ENDPOINT}/${R2_BUCKET}/${Key}`;
+};
+
+app.listen(PORT, () => {
+  console.log(`🚀 Server running at http://localhost:${PORT}`);
+});
