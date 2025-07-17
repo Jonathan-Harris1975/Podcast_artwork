@@ -1,35 +1,16 @@
+// Updated uploadFolderToR2.mjs to support uploading PNG images to R2 import fs from 'fs'; import path from 'path'; import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3'; import mime from 'mime-types'; import dotenv from 'dotenv';
 
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
-import { readdir, readFile } from 'node:fs/promises';
-import path from 'node:path';
+dotenv.config();
 
-const folder = process.argv[2] || 'dist';
+const client = new S3Client({ region: process.env.S3_REGION, endpoint: process.env.S3_ENDPOINT, credentials: { accessKeyId: process.env.S3_ACCESS_KEY_ID, secretAccessKey: process.env.S3_SECRET_ACCESS_KEY, }, });
 
-const client = new S3Client({
-  region: 'auto',
-  endpoint: process.env.R2_ENDPOINT,
-  credentials: {
-    accessKeyId: process.env.R2_ACCESS_KEY,
-    secretAccessKey: process.env.R2_SECRET_KEY
-  }
-});
+const folderPath = './images'; // Folder to upload (update this path if needed) const bucket = process.env.S3_BUCKET;
 
-async function uploadDir(dir, prefix = '') {
-  const entries = await readdir(dir, { withFileTypes: true });
-  for (const entry of entries) {
-    const full = path.join(dir, entry.name);
-    const key = path.posix.join(prefix, entry.name);
-    if (entry.isDirectory()) {
-      await uploadDir(full, key);
-    } else {
-      const body = await readFile(full);
-      await client.send(new PutObjectCommand({
-        Bucket: process.env.R2_BUCKET,
-        Key: key,
-        Body: body
-      }));
-      console.log(`✅ Uploaded ${key}`);
-    }
-  }
-}
-await uploadDir(folder);
+async function uploadFile(filePath) { const fileContent = fs.readFileSync(filePath); const fileKey = path.basename(filePath); const contentType = mime.lookup(filePath) || 'application/octet-stream';
+
+const command = new PutObjectCommand({ Bucket: bucket, Key: fileKey, Body: fileContent, ContentType: contentType, });
+
+try { await client.send(command); console.log(Uploaded: ${fileKey}); } catch (error) { console.error(Error uploading ${fileKey}:, error); } }
+
+fs.readdirSync(folderPath).forEach(file => { const fullPath = path.join(folderPath, file); if (fs.lstatSync(fullPath).isFile()) { uploadFile(fullPath); } });
+
