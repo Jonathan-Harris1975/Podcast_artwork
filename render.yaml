@@ -1,8 +1,0 @@
-
-services:
-  - type: web
-    name: r2-uploader
-    env: node
-    buildCommand: "npm install"
-    startCommand: "npm start"
-    autoDeploy: true
