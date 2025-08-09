@@ -1,0 +1,32 @@
+stages:
+  - test
+  - build
+  - deploy
+
+image: node:20
+
+variables:
+  NODE_ENV: production
+
+cache:
+  paths:
+    - node_modules/
+
+test:
+  stage: test
+  script:
+    - npm ci
+    - npm test || echo "No tests configured"
+
+build:
+  stage: build
+  script:
+    - npm ci --omit=dev
+    - echo "No build step (node app)."
+
+deploy:
+  stage: deploy
+  script:
+    - echo "Deploy step placeholder - configure to your platform (Heroku, Docker, server, etc.)"
+  only:
+    - main
