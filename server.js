@@ -20,7 +20,7 @@ dotenv.config();
 const {
   OPENAI_API_KEY,
   R2_ACCESS_KEY_ID,
-  R2_SECRET_ACCESS_KEY,
+  R2_SECRET_KEY,
   R2_BUCKET_NAME,
   R2_ENDPOINT,
   R2_PUBLIC_BASE_URL,
@@ -44,7 +44,7 @@ const s3 = new S3Client({
   endpoint: R2_ENDPOINT,
   credentials: {
     accessKeyId: R2_ACCESS_KEY_ID || "",
-    secretAccessKey: R2_SECRET_ACCESS_KEY || ""
+    secretAccessKey: R2_SECRET_KEY || ""
   },
   forcePathStyle: false // R2 works with virtual-host style
 });
