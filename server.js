@@ -30,7 +30,7 @@ const {
 if (!OPENAI_API_KEY) {
   console.warn("WARNING: OPENAI_API_KEY not set. /generate will fail without it.");
 }
-if (!R2_ACCESS_KEY_ID || !R2_SECRET_ACCESS_KEY || !R2_BUCKET_NAME || !R2_ENDPOINT || !R2_PUBLIC_BASE_URL) {
+if (!R2_ACCESS_KEY|| !R2_SECRET_ACCESS_KEY || !R2_BUCKET_NAME || !R2_ENDPOINT || !R2_PUBLIC_BASE_URL) {
   console.warn("WARNING: R2 environment variables are not fully configured. Uploads will fail.");
 }
 
