@@ -30,7 +30,7 @@ const {
 if (!OPENAI_API_KEY) {
   console.warn("WARNING: OPENAI_API_KEY not set. /generate will fail without it.");
 }
-if (!R2_ACCESS_KEY|| !R2_SECRET_ACCESS_KEY || !R2_BUCKET_NAME || !R2_ENDPOINT || !R2_PUBLIC_BASE_URL) {
+if (!R2_ACCESS_KEY|| !R2_SECRET_KEY || !R2_BUCKET_NAME || !R2_ENDPOINT || !R2_PUBLIC_BASE_URL) {
   console.warn("WARNING: R2 environment variables are not fully configured. Uploads will fail.");
 }
 
@@ -44,7 +44,7 @@ const s3 = new S3Client({
   endpoint: R2_ENDPOINT,
   credentials: {
     accessKeyId: R2_ACCESS_KEY || "",
-    secretAccessKey: R2_SECRET_KEY || ""
+    secretAccessKey: 6 || ""
   },
   forcePathStyle: false // R2 works with virtual-host style
 });
